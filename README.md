@@ -13,3 +13,23 @@ why did I take these decisions
 $env:GROQ_API_KEY="your_api_key_here"
 py -m uvicorn main:app --reload
 http://127.0.0.1:8000/docs
+
+"""
+SHL Assessment Recommender — main service
+==========================================
+Pipeline stages (in order):
+  1. FastAPI + Pydantic input validation
+  2. Turn counter guard
+  3. Stateless reconstruction from messages[]
+  4. Single merged LLM call  (context extraction + intent + sufficiency)
+  5. Scope guard              (off-topic / legal / prompt-injection → refuse)
+  6. Hybrid retrieval         (BM25 + FAISS + RRF, no hard cutoff)
+  7. Rank-based selection     (top-K by rank, LLM trims to ≤10)
+  8. Structured catalog fields injected for compare / recommend
+  9. LLM response generator   (Groq Llama 3, system prompt + catalog context)
+ 10. URL validation guard     (strip anything not in catalog allowlist)
+ 11. EOC logic                (explicit three-rule criteria)
+ 12. Pydantic output guard    (coerce + validate before returning)
+
+Compatible with future stages: scraper, evaluation harness, refinement loop.
+"""
